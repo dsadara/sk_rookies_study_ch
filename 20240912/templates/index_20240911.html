@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK 쉴더스 루키즈</title>
+</head>
+<body>
+    <h1> Welcome! </h1>
+    <!-- /login 경로로 이동하는 링크 -->
+    <!-- <a href="/login">Login Page</a> -->
+    <!-- <a href="/login">Login Page</a> -->
+    <a href="{{ url_for('login') }}">Login Page</a>
+    
+    <!-- /user/test 경로로 이동하는 링크 -->
+    <!-- <a href="/user/test">Profile Page</a> -->
+    <a href="{{ url_for('profile', username='abcd') }}">Profile Page</a>
+</body>
+</html>

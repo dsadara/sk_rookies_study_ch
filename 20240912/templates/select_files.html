@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Files for Download</title>
+</head>
+<body>
+    <h1>Select Files to Download</h1>
+    <form action="/download" method="POST">
+        <ul>
+            {% for file in files %}
+                <li>
+                    <input type="checkbox" name="files" value="{{ file }}">
+                    <label>{{ file }}</label>
+                </li>
+            {% endfor %}
+        </ul>
+        <input type="submit" value="Download Selected Files">
+    </form>
+</body>
+</html>
