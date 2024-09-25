@@ -1,0 +1,95 @@
+
+라우팅 테이블에 목적지 정보 명시되었는가
+
+양쪽 라우팅 테이블 확인해보기
+en
+show ip
+
+pc -> tcp / ip 등록 정보 -> ip / sm / gw 잘 세팅되어 있는지
+
+
+Pinging 192.168.5.10 with 32 bytes of data:
+
+Request timed out.
+Request timed out.
+Request timed out.
+Request timed out.
+
+Ping statistics for 192.168.5.10:
+    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss),
+
+Pinging 192.168.5.10 with 32 bytes of data:
+
+Request timed out.
+Request timed out.
+Request timed out.
+Request timed out.
+
+Ping statistics for 192.168.5.10:
+    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss),
+
+반대 스위치
+
+1    00e0.f918.6b01    DYNAMIC     Fa0/1
+
+여기 컴퓨터
+
+Physical Address................: 0000.0C54.DC12
+IP Address......................: 192.168.1.10
+Subnet Mask.....................: 255.255.255.0
+Default Gateway.................: 192.168.1.254
+DNS Servers.....................: 0.0.0.
+
+여기 스위치
+
+1    0001.9684.c001    DYNAMIC     Fa0/1
+
+192.168.3.1 라우팅 테이블
+C    192.168.1.0/24 is directly connected, FastEthernet0/0
+C    192.168.3.0/24 is directly connected, Serial0/0
+S    192.168.5.0/24 is directly connected, Serial0/0
+
+192.168.5.254 라우팅 테이블
+
+S    192.168.1.0/24 is directly connected, FastEthernet0/0
+C    192.168.3.0/24 is directly connected, Serial0/1
+C    192.168.5.0/24 is directly connected, FastEthernet0/0
+
+반대 컴퓨터
+
+Physical Address................: 0004.9A5D.E18E
+IP Address......................: 192.168.5.10
+Subnet Mask.....................: 255.255.255.0
+Default Gateway.................: 192.168.3.2
+DNS Servers.....................: 0.0.0.0
+
+1번 라우터에 문제
+2번 라우터에 문제
+
+
+S 192.168.5.0/24 is directly connected, Serial0/0 => 192.168.5.0/24는 Gateway-2의 FastEthernet0/0과 직접 연결되어야 하므로, 192.168.5.0/24 네트워크에 대한 경로는 Serial0/0이 아니라 Serial0/1을 통해 Gateway-2로 연결되어야 트래픽이 올바르게 전송된다.
+
+S 192.168.1.0/24 is directly connected, FastEthernet0/0 => "192.168.1.0/24 네트워크는 Gateway-1의 FastEthernet0/0과 직접 연결되어 있다. 해당 경로가 정적 경로로 설정되어 있는 것은 잘못된 것이다. 정적 경로 대신 직접 연결(C: connected) 상태로 표시되어야 하며, 라우터 간 트래픽은 Serial 인터페이스를 통해 라우팅되어야 한다.
+
+p c3번이 게이트웨이 5를 거쳐서 3으로 가야 함
+
+문제점
+
+Router 0
+en
+show ip route
+
+Router 1
+show ip route
+
+
+pc3
+ipconfig /all 체크시
+GT가 192.168.3.2로 되어 있음
+이걸 102.168.3.254로 바꿔 줘야함
+
+router 0
+S 192.168.5.0/24 is directly connected, Serial0/0 => 192.168.5.0/24는 Gateway-2의 FastEthernet0/0과 직접 연결되어야 하므로, 192.168.5.0/24 네트워크에 대한 경로는 Serial0/0이 아니라 Serial0/1을 통해 Gateway-2로 연결되어야 트래픽이 올바르게 전송된다.
+
+router 1
+S 192.168.1.0/24 is directly connected, FastEthernet0/0 => "192.168.1.0/24 네트워크는 Gateway-1의 FastEthernet0/0과 직접 연결되어 있다. 해당 경로가 정적 경로로 설정되어 있는 것은 잘못된 것이다. 정적 경로 대신 직접 연결(C: connected) 상태로 표시되어야 하며, 라우터 간 트래픽은 Serial 인터페이스를 통해 라우팅되어야 한다.
