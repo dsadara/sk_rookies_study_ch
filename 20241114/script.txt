@@ -1,0 +1,117 @@
+[snort 설치]
+yum install epel-release -y
+
+yum install wget gcc gcc-c++ libnetfilter_queue-devel git flex bison zlib zlib-devel pcre pcredevel libdnet* libpcap* nghttp2 xz-devel libtool libsfbpf* daq* -y
+
+rpm -ivh https://snort.org/downloads/snort/snort-2.9.20-1.centos.x86_64.rpm
+
+ln -s /usr/lib64/libdnet.so.1.0.1 /usr/lib64/libdnet.1
+
+[snort.conf]
+checksum: none(145)
+dynamicrule 주석 처리(253)
+white/blacklist 주석 처리(511,512)
+output: alert.log(522)
+룰 설정(548)
+룰과 sid 파일
+
+[snort 룰 샘플]
+alert icmp any any -> any any (msg:"ping-request"; itype:8; sid:1000000; rev:1;)
+alert icmp any any -> any any (msg:"ping-response"; itype:0; sid:1000001; rev:1;)
+alert tcp any any -> any 80 (msg:"web-request"; content:"GET /"; sid:1000002; rev:1;)
+alert tcp any 80 -> any any (msg:"web-response"; content:"HTTP/"; sid:1000003; rev:1;)
+
+[snort 실행 모드]
+snort -i eth1 -c /etc/snort/snort.conf
+-> alert.log(binary)
+
+-A fast
+-> alert(ip 헤더까지 + snort.log, readable)
+
+-A full
+-> alert(프로토콜 헤더까지 + snort.log, readable)
+
+-K ascii
+-> 출발지별 로그 폴더 생성
+
+
+[mysql8 설치]
+rpm -ivh https://dev.mysql.com/get/mysql80-community-release-el7-11.noarch.rpm
+
+yum install mysql-server mysql-devel -y
+
+service mysqld status
+
+[mysql 패스워드 정책 변경]
+echo >> /etc/my.cnf
+echo "default_password_lifetime=0" >> /etc/my.cnf
+echo "validate_password.policy=LOW" >> /etc/my.cnf
+echo "validate_password.length=6" >> /etc/my.cnf
+echo "validate_password.special_char_count=0" >> /etc/my.cnf
+echo "validate_password.mixed_case_count=0" >> /etc/my.cnf
+echo "validate_password.number_count=0" >> /etc/my.cnf
+echo "skip_external_locking" >> /etc/my.cnf
+echo "skip_name_resolve " >> /etc/my.cnf
+
+service mysqld restart
+
+[mysql 패스워드/접속권한 변경]
+grep "temporary password is generated" /var/log/mysqld.log | grep -oP "\S+$"
+
+mysql --connect-expired-password -uroot -p -e "alter user 'root'@'localhost' identified with mysql_native_password by 'no1ids';"
+
+mysql -uroot -p -e "create user 'root'@'%' identified by 'no1ids';"
+
+mysql -uroot -p -e "alter user 'root'@'%' identified with mysql_native_password by 'no1ids';"
+
+mysql -uroot -p -e "grant all privileges on *.* to 'root'@'%' with grant option;"
+
+
+[barnyard2 설치]
+wget https://github.com/firnsy/barnyard2/archive/master.tar.gz -O barnyard2.tar.gz
+tar xvzf barnyard2.tar.gz
+cd barnyard2-master
+
+sed -i 's/my_bool/bool/' src/output-plugins/spo_database.h
+
+./autogen.sh
+
+./configure --with-mysql --with-mysql-libraries=/usr/lib64/mysql && make && make install
+
+mkdir /var/log/barnyard2
+touch /var/log/snort/barnyard2.temp
+cp /usr/local/etc/barnyard2.conf /etc/snort/
+
+mysql -u root -p -e "create database snort";
+
+mysql -u root -p -D snort < schemas/create_mysql
+
+[barnyard2.conf]
+db 연동
+
+[barnyard2 실행]
+barnyard2 -c 설정파일 -d '로그파일 경로' -f '로그파일' -w '임시파일' 
+
+
+[DB 쿼리문]
+select a.timestamp, b.sig_name
+from event a, signature b
+where a.signature = b.sig_id
+
+select a.cid, a.timestamp, b.sig_name, inet_ntoa(c.ip_src), inet_ntoa(c.ip_dst), unhex(d.data_payload)
+from event a, signature b, iphdr c, data d
+where a.signature = b.sig_id
+and a.sid = c.sid and a.cid = c.cid
+and a.sid = d.sid and a.cid = d.cid
+
+
+[엘라스틱 쿼리문]
+curl –XPUT http://192.168.56.1:9200/testindex?pretty=true
+
+curl -XGET http://192.168.56.1:9200/testindex?pretty=true
+
+curl -XPUT http://192.168.56.1:9200/testindex/_doc/1?pretty=true -d "{\"key\": \"value\"}" -H "Content-Type: application/json"
+
+curl -XGET http://192.168.56.1:9200/testindex/_search?pretty=true -d "{\"query\": {\"match_all\": {}}}" -H "Content-Type: application/json"
+
+curl -XDELETE http://192.168.56.1:9200/testindex?pretty=true
