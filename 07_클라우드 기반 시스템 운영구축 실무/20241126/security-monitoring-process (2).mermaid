@@ -1,0 +1,45 @@
+graph TB
+    subgraph 탐지단계
+        A1[현업부서\n정오탐분석] 
+        B1[보안관제\n내부위협탐지] 
+        C1[침해대응\n의심코드분석]
+        D1[보안진단\n모의해킹]
+        E1[고객사\n보고서확인]
+
+        A1 --> B1
+        B1 --> C1
+        C1 --> D1
+        D1 --> E1
+    end
+
+    F{정오탐\n분석}
+
+    subgraph 대응단계
+        A2[현업부서\n시스템점검]
+        B2[보안관제\n위협분석]
+        C2[침해대응\n정책수정]
+        D2[보안진단\n재발방지]
+        E2[고객사\n조치이행]
+
+        A2 --> B2
+        B2 --> C2
+        C2 --> D2
+        D2 --> E2
+    end
+
+    E1 --> F
+    F -->|정탐| A2
+    F -->|오탐| G[정책관리]
+
+    style A1 fill:#f5f5f5,stroke:#333,stroke-width:2px
+    style B1 fill:#e0e0e0,stroke:#333,stroke-width:2px
+    style C1 fill:#f5f5f5,stroke:#333,stroke-width:2px
+    style D1 fill:#e0e0e0,stroke:#333,stroke-width:2px
+    style E1 fill:#f5f5f5,stroke:#333,stroke-width:2px
+    style A2 fill:#f5f5f5,stroke:#333,stroke-width:2px
+    style B2 fill:#e0e0e0,stroke:#333,stroke-width:2px
+    style C2 fill:#f5f5f5,stroke:#333,stroke-width:2px
+    style D2 fill:#e0e0e0,stroke:#333,stroke-width:2px
+    style E2 fill:#f5f5f5,stroke:#333,stroke-width:2px
+    style F fill:#ffffff,stroke:#333,stroke-width:2px
+    style G fill:#e0e0e0,stroke:#333,stroke-width:2px
