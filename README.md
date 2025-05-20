@@ -1,5 +1,1 @@
-# sk_rookies_study
-sk rookies github 학습을 위한 저장소
-
-## TEST
-
+SK 쉴더스 루키즈에서 배운 내용들을 정리한 저장소입니다.
